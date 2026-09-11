@@ -3,7 +3,7 @@ import com.bank.model.account;
 import java.util.ArrayList;
 import java.util.List;
 
-public class accountstorage {
+public class AccountStorage {
     private List<account> accounts=new ArrayList<>();
      public void add (account account){
          accounts.add(account);

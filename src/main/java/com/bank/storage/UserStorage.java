@@ -3,9 +3,9 @@ import com.bank.model.User;
 import java.util.ArrayList;
 import java.util.List;
 
-public class userStorage {
+public class UserStorage {
     private List<User> users= new ArrayList<>();
-    public void save (User user){
+    public void add (User user){
         users.add(user);
 
     }
