@@ -36,9 +36,7 @@ public class AccountService {
             return false;
         }
         account.setBalance(account.getBalance() + amount);
-        System.out.println(
-                "Счёт пополнен на " + amount + " ₸."
-        );
+        System.out.println("Счёт пополнен на " + amount + " T");
         return true;
     }
     public boolean withdraw(
@@ -48,17 +46,12 @@ public class AccountService {
 
         if (amount <= 0) {
 
-            System.out.println(
-                    "Сумма должна быть больше 0."
-            );
-
+            System.out.println("Сумма должна быть больше 0.");
             return false;
         }
         if (amount>account.getBalance()) {
 
-            System.out.println(
-                    "Недостаточно средств."
-            );
+            System.out.println("Недостаточно средств.");
             return false;
         }
         account.setBalance(account.getBalance() - amount);
