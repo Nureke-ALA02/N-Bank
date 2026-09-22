@@ -1,11 +1,11 @@
 package com.bank.model;
 
-public class account {
+public class Account {
     private Long id ;
     private User owner;
     private double balance ;
 
-    public account(Long id, User owner, double balance) {
+    public Account(Long id, User owner, double balance) {
         this.id = id;
         this.owner = owner;
         this.balance = balance;

@@ -1,6 +1,6 @@
 package com.bank;
 
-import com.bank.model.account;
+import com.bank.model.Account;
 import com.bank.model.User;
 import com.bank.service.AccountService;
 import com.bank.service.UserService;
@@ -16,7 +16,7 @@ public class Main {
         UserService userService =new UserService(userStorage);
         AccountService accountService =new AccountService(accountStorage);
         User currentUser = null;
-        account currentAccount = null;
+        Account currentAccount = null;
         while (true) {
             if (currentUser == null) {
                 System.out.println();
