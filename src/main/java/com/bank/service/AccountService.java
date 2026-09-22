@@ -1,6 +1,6 @@
 package com.bank.service;
 
-import com.bank.model.account;
+import com.bank.model.Account;
 import com.bank.model.User;
 import com.bank.storage.AccountStorage;
 
@@ -14,20 +14,20 @@ public class AccountService {
         this.accountStorage = accountStorage;
     }
 
-    public account createAccount(User user) {
+    public Account createAccount(User user) {
 
-        account oldAccount = accountStorage.findByUserId(user.getId());
+        Account oldAccount = accountStorage.findByUserId(user.getId());
         if (oldAccount != null) {
             return oldAccount;
         }
-        account account = new account(nextId, user, 0);
+        Account account = new Account(nextId, user, 0);
         nextId++;
         accountStorage.add(account);
         return account;
     }
 
     public boolean deposit(
-            account account,
+            Account account,
             double amount
     ) {
 
@@ -40,7 +40,7 @@ public class AccountService {
         return true;
     }
     public boolean withdraw(
-            account account,
+            Account account,
             double amount
     ) {
 

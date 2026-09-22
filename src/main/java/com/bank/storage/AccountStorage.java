@@ -1,16 +1,16 @@
 package com.bank.storage;
-import com.bank.model.account;
+import com.bank.model.Account;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AccountStorage {
-    private List<account> accounts=new ArrayList<>();
-     public void add (account account){
+    private List<Account> accounts=new ArrayList<>();
+     public void add (Account account){
          accounts.add(account);
      }
 
-     public account findByUserId(Long userId){
-         for  (account account:accounts){
+     public Account findByUserId(Long userId){
+         for  (Account account:accounts){
              if (account.getOwner().getId().equals(userId)){
                  return account;
              }
