@@ -1,10 +1,13 @@
 package com.bank.storage;
 import com.bank.model.Account;
+import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class AccountStorage {
-    private List<Account> accounts=new ArrayList<>();
+    private final List<Account> accounts=new ArrayList<>();
      public void add (Account account){
          accounts.add(account);
      }
@@ -17,4 +20,12 @@ public class AccountStorage {
          }
          return null;
      }
+    public Account findById(Long id) {
+        for (Account account :accounts) {
+            if (account.getId().equals(id)) {
+                return account;
+            }
+        }
+        return null;
+    }
 }
