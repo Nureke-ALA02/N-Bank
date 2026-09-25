@@ -3,10 +3,12 @@ package com.bank.service;
 import com.bank.model.Account;
 import com.bank.model.User;
 import com.bank.storage.AccountStorage;
+import org.springframework.stereotype.Service;
 
+@Service
 public class AccountService {
 
-    private AccountStorage accountStorage;
+    private final AccountStorage accountStorage;
 
     private Long nextId = 1L;
 
@@ -26,9 +28,12 @@ public class AccountService {
         return account;
     }
 
-    public boolean deposit(
-            Account account,
-            double amount
+    public Account getAccount(Long id) {
+
+        return accountStorage.findById(id);
+    }
+
+    public boolean deposit(Account account, double amount
     ) {
 
         if (amount <= 0) {
