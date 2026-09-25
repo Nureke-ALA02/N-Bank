@@ -14,6 +14,10 @@ public class UserService {
     }
 
     public User register( String iin, String firstName, String lastName, LocalDate birthDate, String email, String password){
+        if (!email.contains("@")){
+            throw new RuntimeException("Email должен содержать @");
+        }
+
         User oldUser=userStorage.findbyEmail(email);
             if (oldUser !=null){
                 System.out.println("Такой пользователь уже существует");
