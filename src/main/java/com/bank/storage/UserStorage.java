@@ -15,7 +15,14 @@ public class UserStorage {
     public List<User> findAll(){
         return users;
     }
-
+    public User findById(Long id) {
+        for (User user : users) {
+            if (user.getId().equals(id)) {
+                return user;
+            }
+        }
+        return null;
+    }
     public User findbyEmail(String email){
         for (User user:users){
             if (user.getEmail().equals(email)){
