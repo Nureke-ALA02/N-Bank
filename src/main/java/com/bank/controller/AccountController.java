@@ -19,7 +19,7 @@ public AccountController(AccountService accountService,UserStorage userStorage){
 @PostMapping("/create/{userId}")
         public Account createAccount (@PathVariable Long userId){
         User user =userStorage.findById(userId);
-        if (user=null){
+        if (user==null){
             throw new RuntimeException("Пользователь не найден");
         }
         return accountService.createAccount(user);
