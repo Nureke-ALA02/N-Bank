@@ -13,7 +13,7 @@ public class Transaction {
     private Account account;
     @Column(nullable = false,length = 30)
     private String type;
-    @Column(nullable = false,precision = 19,scale = 2)
+    @Column(nullable = false)
     private double amount ;
     @Column(nullable = false)
     private LocalDateTime date;

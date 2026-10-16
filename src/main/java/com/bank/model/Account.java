@@ -11,7 +11,7 @@ public class Account {
     @OneToOne
     @JoinColumn(name = "user_id",nullable = false,unique = true)
     private User owner;
-    @Column(nullable = false,precision = 19,scale = 2)
+    @Column(nullable = false)
     private double balance ;
 
     public Account(Long id, User owner, double balance) {
