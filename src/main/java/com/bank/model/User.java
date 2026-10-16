@@ -1,16 +1,28 @@
 package com.bank.model;
 
 import java.time.LocalDate;
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "users")
 public class User {
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String firsname;
-    private String lastname;
+    @Column(nullable = false,unique = true,length = 12)
     private String iin;
+    @Column(nullable = false)
+    private String firsname;
+    @Column(nullable = false)
+    private String lastname;
+    @Column(nullable = false)
     private LocalDate brithDate;
+    @Column(nullable = false,unique = true)
     private String email;
+    @Column(nullable = false)
     private String password;
+
+    protected User(){}
 
     public User(Long id, String firsname, String lastname, String iin, LocalDate brithDate, String email, String password) {
         this.id = id;
@@ -34,7 +46,7 @@ public class User {
         return firsname;
     }
 
-    public void setFirsname(String firsname) {
+    public void setFirstsname(String firstsname) {
         this.firsname = firsname;
     }
 
