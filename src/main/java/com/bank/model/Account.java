@@ -1,8 +1,17 @@
 package com.bank.model;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "accounts")
 public class Account {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id ;
+    @OneToOne
+    @JoinColumn(name = "user_id",nullable = false,unique = true)
     private User owner;
+    @Column(nullable = false,precision = 19,scale = 2)
     private double balance ;
 
     public Account(Long id, User owner, double balance) {
