@@ -1,20 +1,32 @@
 package com.bank.model;
 
 import java.time.LocalDate;
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "users")
 public class User {
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String firsname;
-    private String lastname;
+    @Column(nullable = false,unique = true,length = 12)
     private String iin;
+    @Column(nullable = false)
+    private String firstname;
+    @Column(nullable = false)
+    private String lastname;
+    @Column(nullable = false)
     private LocalDate brithDate;
+    @Column(nullable = false,unique = true)
     private String email;
+    @Column(nullable = false)
     private String password;
+
+    protected User(){}
 
     public User(Long id, String firsname, String lastname, String iin, LocalDate brithDate, String email, String password) {
         this.id = id;
-        this.firsname = firsname;
+        this.firstname = firstname;
         this.lastname = lastname;
         this.iin = iin;
         this.brithDate = brithDate;
@@ -31,11 +43,11 @@ public class User {
     }
 
     public String getFirsname() {
-        return firsname;
+        return firstname;
     }
 
-    public void setFirsname(String firsname) {
-        this.firsname = firsname;
+    public void setFirstsname(String firstsname) {
+        this.firstname = firstname;
     }
 
     public String getLastname() {
