@@ -5,6 +5,8 @@ import com.bank.service.AccountService;
 import com.bank.storage.UserStorage;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+
 @RestController
 @RequestMapping("/accounts")
 
@@ -25,7 +27,7 @@ public AccountController(AccountService accountService,UserStorage userStorage){
         return accountService.createAccount(user);
     }
     @GetMapping("/{id}/balance")
-    public double getBalance(@PathVariable Long id) {
+    public BigDecimal getBalance(@PathVariable Long id) {
 
         Account account = accountService.getAccount(id);
 
@@ -39,7 +41,7 @@ public AccountController(AccountService accountService,UserStorage userStorage){
     ) {
         Account account = accountService.getAccount(id);
 
-        accountService.deposit(account, amount);
+        accountService.deposit(account, BigDecimal.valueOf(amount));
 
         return "Счёт пополнен на " + amount + " ₸";
     }
@@ -51,7 +53,7 @@ public AccountController(AccountService accountService,UserStorage userStorage){
     ) {
         Account account = accountService.getAccount(id);
 
-        accountService.withdraw(account, amount);
+        accountService.withdraw(account, BigDecimal.valueOf(amount));
 
         return "Снято " + amount + " ₸";
     }

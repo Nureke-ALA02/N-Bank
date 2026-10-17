@@ -1,20 +1,28 @@
 package com.bank.model;
 
+import com.bank.model.User;
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "accounts")
 public class Account {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id ;
-    @OneToOne
-    @JoinColumn(name = "user_id",nullable = false,unique = true)
-    private User owner;
-    @Column(nullable = false)
-    private double balance ;
+    private Long id;
 
-    public Account(Long id, User owner, double balance) {
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    private User owner;
+
+    @Column(nullable = false, precision = 19, scale = 2)
+    private BigDecimal balance;
+
+    protected Account() {
+    }
+
+    public Account(Long id, User owner, BigDecimal balance) {
         this.id = id;
         this.owner = owner;
         this.balance = balance;
@@ -24,23 +32,15 @@ public class Account {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public User getOwner() {
         return owner;
     }
 
-    public void setOwner(User owner) {
-        this.owner = owner;
-    }
-
-    public double getBalance() {
+    public BigDecimal getBalance() {
         return balance;
     }
 
-    public void setBalance(double balance) {
+    public void setBalance(BigDecimal balance) {
         this.balance = balance;
     }
 }
