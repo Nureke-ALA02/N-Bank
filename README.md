@@ -1,56 +1,99 @@
 # N-Bank
 
-A simple online banking application built with Java and Spring Boot.
+A simple online banking REST API built with Java and Spring Boot. The application allows users to register, log in, create bank accounts, check balances, deposit money, and withdraw money.
 
 ## Technologies
 
-* Java 22
-* Spring Boot 4.1.1
-* Maven
-* Spring Web
-* REST API
-* IntelliJ IDEA
-* Postman
+- **Java 22**
+- **Spring Boot 4.1.1**
+- **Maven**
+- **Spring Web** — REST API endpoints
+- **Spring Data JPA** — database access
+- **Hibernate** — ORM
+- **PostgreSQL** — relational database
+- **JUnit 5 and Mockito** — testing
+- **IntelliJ IDEA** — development environment
+- **Postman** — API testing
 
 ## Project Description
 
-N-Bank is a simple banking application that allows users to:
+N-Bank is an educational banking application that provides basic banking operations through a REST API.
 
-* Register an account
-* Log in
-* Create a bank account
-* Check balance
-* Deposit money
-* Withdraw money
-* Validate email during registration
+Users can:
 
-The application currently stores data in memory using `ArrayList`.
+- Register with personal information.
+- Log in using their email and password.
+- Create a bank account.
+- Check their account balance.
+- Deposit money.
+- Withdraw money.
+- Validate email addresses and prevent duplicate emails and IINs.
 
-> Data will be deleted when the application is restarted.
+The application uses PostgreSQL to store data. Spring Data JPA and Hibernate are used to interact with the database.
 
 ## Project Structure
 
 ```text
-src/main/java/com/bank
-├── NBankApplication.java
-│
-├── controller
-│   ├── UserController.java
-│   └── AccountController.java
-│
-├── model
-│   ├── User.java
-│   ├── Account.java
-│   └── Transaction.java
-│
-├── service
-│   ├── UserService.java
-│   └── AccountService.java
-│
-└── storage
-    ├── UserStorage.java
-    └── AccountStorage.java
+src
+├── main
+│   ├── java/com/bank
+│   │   ├── NBankApplication.java
+│   │   ├── controller
+│   │   │   ├── UserController.java
+│   │   │   └── AccountController.java
+│   │   ├── model
+│   │   │   ├── User.java
+│   │   │   ├── Account.java
+│   │   │   └── Transaction.java
+│   │   ├── repository
+│   │   ├── service
+│   │   │   ├── UserService.java
+│   │   │   └── AccountService.java
+│   │   └── ...
+│   └── resources
+│       └── application.properties
+└── test
+    └── java/com/bank
+        ├── NBankApplicationTests.java
+        ├── controller
+        │   ├── AccountControllerTest.java
+        │   └── UserControllerTest.java
+        └── service
+            ├── AccountServiceTest.java
+            └── UserServiceTest.java
 ```
+
+The exact package contents may vary as the project develops.
+
+## Prerequisites
+
+Before running the application, install:
+
+- Java 22 or a compatible JDK configured for the project.
+- Maven.
+- PostgreSQL.
+- IntelliJ IDEA or another Java IDE.
+- Postman (optional, for testing API endpoints).
+
+## Database Configuration
+
+1. Start PostgreSQL.
+2. Create a database named `N-Bank`.
+3. Open `src/main/resources/application.properties`.
+4. Configure the database URL, username, and password.
+
+Example configuration:
+
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/N-Bank
+spring.datasource.username=YOUR_USERNAME
+spring.datasource.password=YOUR_PASSWORD
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.open-in-view=false
+```
+
+Replace `YOUR_USERNAME` and `YOUR_PASSWORD` with your PostgreSQL credentials. Keep real credentials out of public repositories.
 
 ## How to Run
 
@@ -58,219 +101,174 @@ src/main/java/com/bank
 
 ```bash
 git clone <repository-url>
+cd N-Bank
 ```
+
+Replace `<repository-url>` with the actual Git repository URL.
 
 ### 2. Open the project
 
-Open the project in IntelliJ IDEA.
+Open the project folder in IntelliJ IDEA and allow Maven to import the dependencies.
 
-### 3. Run the application
+### 3. Start PostgreSQL
 
-Run:
+Make sure PostgreSQL is running and the database configuration is correct.
 
-```text
-NBankApplication.java
+### 4. Run the application
+
+Run `NBankApplication.java` from IntelliJ IDEA, or use Maven:
+
+```bash
+mvn spring-boot:run
 ```
 
-The application starts on:
+The application starts at:
 
-```text
-http://localhost:8080
-```
+`http://localhost:8080`
 
 ## API Endpoints
 
+All endpoints can be tested using Postman.
+
 ### User Registration
 
-**POST**
-
-```text
-/users/register
-```
-
-Full URL:
+**Method:** `POST`
 
 ```text
 http://localhost:8080/users/register
 ```
-The email must contain `@`.
 
----
+Parameters:
+
+- `iin`
+- `firstName`
+- `lastName`
+- `birthDate`
+- `email`
+- `password`
+
+The birth date must use the format `YYYY-MM-DD`, for example `2004-05-02`.
+
+The email must contain `@`, and the email and IIN must be unique.
 
 ### User Login
 
-**POST**
-
-```text
-/users/login
-```
-
-Full URL:
+**Method:** `POST`
 
 ```text
 http://localhost:8080/users/login
 ```
----
 
-### Create Bank Account
+Parameters:
 
-**POST**
+- `email`
+- `password`
 
-```text
-/accounts/create/{userId}
-```
+### Create a Bank Account
 
-Example:
+**Method:** `POST`
 
 ```text
 http://localhost:8080/accounts/create/1
 ```
 
-Here `1` is the user ID.
+The number `1` is the user ID. The user must exist before an account can be created.
 
----
+### Check Account Balance
 
-### Check Balance
-
-**GET**
-
-```text
-/accounts/{accountId}/balance
-```
-
-Example:
+**Method:** `GET`
 
 ```text
 http://localhost:8080/accounts/1/balance
 ```
 
-Response:
-
-```text
-5000.0
-```
-
----
+Returns the balance of account `1`.
 
 ### Deposit Money
 
-**POST**
-
-```text
-/accounts/{accountId}/deposit?amount={amount}
-```
-
-Example:
+**Method:** `POST`
 
 ```text
 http://localhost:8080/accounts/1/deposit?amount=5000
 ```
 
-Response:
+Example response:
 
 ```text
 Счёт пополнен на 5000.0 ₸
 ```
 
----
+The deposit amount must be greater than zero.
 
 ### Withdraw Money
 
-**POST**
-
-```text
-/accounts/{accountId}/withdraw?amount={amount}
-```
-
-Example:
+**Method:** `POST`
 
 ```text
 http://localhost:8080/accounts/1/withdraw?amount=1000
 ```
 
-Response:
+Example response:
 
 ```text
 Снято 1000.0 ₸
 ```
 
-The user cannot withdraw more money than the current balance.
+The withdrawal amount must be greater than zero and cannot exceed the available balance.
 
 ## Example Workflow
 
-First register a user:
+1. Register a user using `POST /users/register`.
+2. Create an account using `POST /accounts/create/1`.
+3. Check the balance using `GET /accounts/1/balance`.
+4. Deposit 5000 using `POST /accounts/1/deposit?amount=5000`.
+5. Check the balance again.
+6. Withdraw 1000 using `POST /accounts/1/withdraw?amount=1000`.
+7. Check the final balance.
 
-```text
-POST /users/register
-```
-
-Then create an account:
-
-```text
-POST /accounts/create/1
-```
-
-Check the balance:
-
-```text
-GET /accounts/1/balance
-```
-
-Deposit money:
-
-```text
-POST /accounts/1/deposit?amount=5000
-```
-
-Check the balance again:
-
-```text
-GET /accounts/1/balance
-```
-
-Result:
-
-```text
-5000.0
-```
-
-Then withdraw money:
-
-```text
-POST /accounts/1/withdraw?amount=1000
-```
-
-New balance:
-
-```text
-4000.0
-```
+If the initial balance is zero and both operations succeed, the final balance will be `4000`.
 
 ## Validation
 
-The application performs basic validation:
+The application includes basic validation rules:
 
-* Email must contain `@`
-* Email must be unique
-* IIN must be unique
-* Deposit amount must be greater than `0`
-* Withdrawal amount must be greater than `0`
-* Withdrawal amount cannot be greater than the account balance
-* User must exist before creating an account
+- Email must contain `@`.
+- Email must be unique.
+- IIN must be unique.
+- Deposit amounts must be positive.
+- Withdrawal amounts must be positive.
+- Withdrawals cannot exceed the account balance.
+- A user must exist before a bank account can be created.
+- Invalid login credentials are rejected.
+
+## Testing
+
+The project includes tests for controllers, services, and application startup.
+
+Run all tests with:
+
+```bash
+mvn test
+```
+
+To build the project and run its tests:
+
+```bash
+mvn verify
+```
+
+The test suite uses JUnit 5 and Mockito. All tests should pass before considering the build successful.
 
 ## Future Improvements
 
-Possible future improvements:
-
-* PostgreSQL database
-* Spring Data JPA
-* Password hashing
-* Better validation
-* DTOs
-* Authentication and authorization
-* Transaction history
-* Global error handling
-* Frontend application
+- Password hashing and secure credential storage.
+- Authentication and authorization.
+- DTOs and request validation.
+- Improved error handling and consistent HTTP status codes.
+- Transaction history.
+- Integration tests with a dedicated test database.
+- Frontend application.
 
 ## Author
-N-Bank — Java Spring Boot educational project.
+
+N-Bank is an educational Java and Spring Boot project.
