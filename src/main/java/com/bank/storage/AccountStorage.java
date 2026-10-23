@@ -1,5 +1,6 @@
 package com.bank.storage;
 import com.bank.model.Account;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -26,6 +27,10 @@ public class AccountStorage {
                 return account;
             }
         }
+        return null;
+    }
+
+    public @Nullable Object save(Account any) {
         return null;
     }
 }
