@@ -2,84 +2,96 @@
 package com.bank.controller;
 
 import com.bank.model.Account;
+import com.bank.model.Transaction;
 import com.bank.model.User;
 import com.bank.service.AccountService;
-import com.bank.storage.UserStorage;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import com.bank.service.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+@RestController
+@RequestMapping("/accounts")
+public class AccountController {
 
-@ExtendWith(MockitoExtension.class)
-class AccountControllerTest {
+    private final AccountService accountService;
+    private final UserService userService;
 
-    @Mock
-    private AccountService accountService;
-
-    @Mock
-    private UserStorage userStorage;
-
-    @InjectMocks
-    private AccountController accountController;
-
-    @Test
-    void createAccountReturnsCreatedAccount() {
-        User user = mock(User.class);
-        Account account = mock(Account.class);
-
-        when(userStorage.findById(1L)).thenReturn(user);
-        when(accountService.createAccount(user)).thenReturn(account);
-
-        assertSame(account, accountController.createAccount(1L));
-        verify(accountService).createAccount(user);
+    public AccountController(AccountService accountService,
+                             UserService userService) {
+        this.accountService = accountService;
+        this.userService = userService;
     }
 
-    @Test
-    void createAccountFailsWhenUserDoesNotExist() {
-        when(userStorage.findById(1L)).thenReturn(null);
+    // Создание счета
+    @PostMapping("/create/{userId}")
+    public Account createAccount(@PathVariable Long userId) {
+        User user = userService.getUserById(userId);
 
-        assertThrows(RuntimeException.class,
-                () -> accountController.createAccount(1L));
+        if (user == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Пользователь не найден"
+            );
+        }
 
-        verify(accountService, never()).createAccount(any());
+        return accountService.createAccount(user);
     }
 
-    @Test
-    void getBalanceReturnsBalance() {
-        Account account = mock(Account.class);
-        BigDecimal balance = new BigDecimal("1500.00");
+    @GetMapping("/{id}/balance")
+    public BigDecimal getBalance(@PathVariable Long id) {
+        Account account = accountService.getAccount(id);
 
-        when(accountService.getAccount(1L)).thenReturn(account);
-        when(account.getBalance()).thenReturn(balance);
+        if (account == null) {throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Счет не найден");
+        }
 
-        assertEquals(balance, accountController.getBalance(1L));
+        return account.getBalance();
     }
+    @PostMapping("/{id}/deposit")
+    public String deposit(
+            @PathVariable Long id,
+            @RequestParam double amount) {
 
-    @Test
-    void depositPassesAmountToService() {
-        Account account = mock(Account.class);
-        when(accountService.getAccount(1L)).thenReturn(account);
+        Account account = accountService.getAccount(id);
 
-        String result = accountController.deposit(1L, 500.0);
-
-        assertEquals("Счёт пополнен на 500.0 ₸", result);
-        verify(accountService).deposit(account, BigDecimal.valueOf(500.0));
+        if (account == null) {throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Счет не найден");
+        }
+        if (!Double.isFinite(amount)) {throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Некорректная сумма");
+        }
+        boolean success = accountService.deposit(account, BigDecimal.valueOf(amount));
+        if (!success) {throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Сумма должна быть больше нуля");
+        }
+        return "Счет пополнен на " + amount + " ₸";
     }
+    @PostMapping("/{id}/withdraw")
+    public String withdraw(@PathVariable Long id, @RequestParam double amount) {
+        Account account = accountService.getAccount(id);
+        if (account == null) {throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Счет не найден");
+        }
+        if (!Double.isFinite(amount)) {throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Некорректная сумма");
+        }
+        boolean success = accountService.withdraw(
+                account,
+                BigDecimal.valueOf(amount)
+        );
+        if (!success) {throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Недостаточно средств или сумма некорректна");
+        }
+        return "Снято " + amount + " ₸";
+    }
+    @GetMapping("/{id}/transactions")
+    public List<Transaction> getTransactions(@PathVariable Long id) {
+        Account account = accountService.getAccount(id);
 
-    @Test
-    void withdrawPassesAmountToService() {
-        Account account = mock(Account.class);
-        when(accountService.getAccount(1L)).thenReturn(account);
+        if (account == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Счет не найден"
+            );
+        }
 
-        String result = accountController.withdraw(1L, 200.0);
-
-        assertEquals("Снято 200.0 ₸", result);
-        verify(accountService).withdraw(account, BigDecimal.valueOf(200.0));
+        return accountService.getTransactions(id);
     }
 }
