@@ -42,11 +42,11 @@ public class User {
         this.id = id;
     }
 
-    public String getFirsname() {
+    public String getFirstname() {
         return firstname;
     }
 
-    public void setFirstsname(String firstsname) {
+    public void setFirstname(String firstname) {
         this.firstname = firstname;
     }
 

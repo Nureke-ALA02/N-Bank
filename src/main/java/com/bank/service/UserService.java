@@ -1,7 +1,9 @@
+
 package com.bank.service;
 
 import com.bank.model.User;
 import com.bank.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,9 +13,14 @@ import java.time.LocalDate;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder
+    ) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
@@ -31,13 +38,13 @@ public class UserService {
             );
         }
 
-        if (userRepository.findByEmail(email) != null) {
+        if (userRepository.existsByEmail(email)) {
             throw new IllegalArgumentException(
                     "Пользователь с таким email уже существует"
             );
         }
 
-        if (userRepository.findByIin(iin) != null) {
+        if (userRepository.existsByIin(iin)) {
             throw new IllegalArgumentException(
                     "Пользователь с таким ИИН уже существует"
             );
@@ -50,21 +57,33 @@ public class UserService {
                 lastName,
                 birthDate,
                 email,
-                password
+                passwordEncoder.encode(password)
         );
 
         return userRepository.save(user);
     }
 
     public User login(String email, String password) {
-        User user = userRepository.findByEmail(email);
+        if (email == null || password == null) {
+            return null;
+        }
 
-        if (user != null && user.getPassword().equals(password)) {
+        User user = userRepository.findByEmail(email)
+                .orElse(null);
+
+        if (user != null
+                && passwordEncoder.matches(
+                password,
+                user.getPassword()
+        )) {
             return user;
         }
 
         return null;
     }
-    public User getUserById(Long id) {return userRepository.findById(id).orElse(null);
+
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+                .orElse(null);
     }
 }
