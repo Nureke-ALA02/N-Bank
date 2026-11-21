@@ -20,7 +20,10 @@ public class BankUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) {
         var user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
-                        new UsernameNotFoundException("Пользователь не найден"));
+                        new UsernameNotFoundException(
+                                "Пользователь не найден"
+                        )
+                );
 
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getEmail())

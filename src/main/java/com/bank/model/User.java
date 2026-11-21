@@ -1,34 +1,51 @@
+
 package com.bank.model;
 
-import java.time.LocalDate;
 import jakarta.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "users")
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false,unique = true,length = 12)
+
+    @Column(nullable = false, unique = true, length = 12)
     private String iin;
+
     @Column(nullable = false)
     private String firstname;
+
     @Column(nullable = false)
     private String lastname;
+
     @Column(nullable = false)
     private LocalDate brithDate;
-    @Column(nullable = false,unique = true)
+
+    @Column(nullable = false, unique = true)
     private String email;
+
     @Column(nullable = false)
     private String password;
 
-    protected User(){}
+    protected User() {
+    }
 
-    public User(Long id, String firsname, String lastname, String iin, LocalDate brithDate, String email, String password) {
+    public User(
+            Long id,
+            String iin,
+            String firstname,
+            String lastname,
+            LocalDate brithDate,
+            String email,
+            String password) {
+
         this.id = id;
+        this.iin = iin;
         this.firstname = firstname;
         this.lastname = lastname;
-        this.iin = iin;
         this.brithDate = brithDate;
         this.email = email;
         this.password = password;
@@ -40,6 +57,14 @@ public class User {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getIin() {
+        return iin;
+    }
+
+    public void setIin(String iin) {
+        this.iin = iin;
     }
 
     public String getFirstname() {
@@ -56,14 +81,6 @@ public class User {
 
     public void setLastname(String lastname) {
         this.lastname = lastname;
-    }
-
-    public String getIin() {
-        return iin;
-    }
-
-    public void setIin(String iin) {
-        this.iin = iin;
     }
 
     public LocalDate getBrithDate() {

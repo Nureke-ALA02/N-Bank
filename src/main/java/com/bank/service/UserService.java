@@ -17,8 +17,7 @@ public class UserService {
 
     public UserService(
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder
-    ) {
+            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -30,13 +29,41 @@ public class UserService {
             String lastName,
             LocalDate birthDate,
             String email,
-            String password
-    ) {
-        if (email == null || !email.contains("@")) {
+            String password) {
+
+        if (iin == null || !iin.matches("\\d{12}")) {
             throw new IllegalArgumentException(
-                    "Email должен содержать @"
+                    "ИИН должен содержать 12 цифр"
             );
         }
+
+        if (firstName == null || firstName.isBlank()
+                || lastName == null || lastName.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Имя и фамилия обязательны"
+            );
+        }
+
+        if (email == null
+                || !email.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
+            throw new IllegalArgumentException(
+                    "Введите корректный email"
+            );
+        }
+
+        if (password == null || password.length() < 8) {
+            throw new IllegalArgumentException(
+                    "Пароль должен содержать минимум 8 символов"
+            );
+        }
+
+        if (birthDate == null) {
+            throw new IllegalArgumentException(
+                    "Дата рождения обязательна"
+            );
+        }
+
+        email = email.trim().toLowerCase();
 
         if (userRepository.existsByEmail(email)) {
             throw new IllegalArgumentException(
@@ -53,8 +80,8 @@ public class UserService {
         User user = new User(
                 null,
                 iin,
-                firstName,
-                lastName,
+                firstName.trim(),
+                lastName.trim(),
                 birthDate,
                 email,
                 passwordEncoder.encode(password)
@@ -68,14 +95,12 @@ public class UserService {
             return null;
         }
 
-        User user = userRepository.findByEmail(email)
-                .orElse(null);
+        User user = userRepository.findByEmail(
+                email.trim().toLowerCase()
+        ).orElse(null);
 
         if (user != null
-                && passwordEncoder.matches(
-                password,
-                user.getPassword()
-        )) {
+                && passwordEncoder.matches(password, user.getPassword())) {
             return user;
         }
 
@@ -83,7 +108,6 @@ public class UserService {
     }
 
     public User getUserById(Long id) {
-        return userRepository.findById(id)
-                .orElse(null);
+        return userRepository.findById(id).orElse(null);
     }
 }

@@ -3,7 +3,6 @@ package com.bank.controller;
 
 import com.bank.model.User;
 import com.bank.repository.UserRepository;
-import com.bank.security.BankUserDetailsService;
 import com.bank.security.JwtService;
 import com.bank.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -25,20 +24,16 @@ public class AuthController {
     private final UserService userService;
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
-    private final BankUserDetailsService userDetailsService;
     private final JwtService jwtService;
 
     public AuthController(
             UserService userService,
             UserRepository userRepository,
             AuthenticationManager authenticationManager,
-            BankUserDetailsService userDetailsService,
-            JwtService jwtService
-    ) {
+            JwtService jwtService) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.authenticationManager = authenticationManager;
-        this.userDetailsService = userDetailsService;
         this.jwtService = jwtService;
     }
 
@@ -48,27 +43,21 @@ public class AuthController {
             String lastName,
             String birthDate,
             String email,
-            String password
-    ) {
+            String password) {
     }
 
-    public record LoginRequest(
-            String email,
-            String password
-    ) {
+    public record LoginRequest(String email, String password) {
     }
 
     public record AuthResponse(
             String token,
             String email,
-            String name
-    ) {
+            String name) {
     }
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public AuthResponse register(@RequestBody RegisterRequest request) {
-
         if (request == null
                 || isBlank(request.iin())
                 || isBlank(request.firstName())
@@ -76,24 +65,9 @@ public class AuthController {
                 || isBlank(request.birthDate())
                 || isBlank(request.email())
                 || isBlank(request.password())) {
-
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Заполните все обязательные поля"
-            );
-        }
-
-        if (!request.email().contains("@")) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Введите корректный email"
-            );
-        }
-
-        if (request.password().length() < 8) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Пароль должен содержать минимум 8 символов"
             );
         }
 
@@ -104,7 +78,7 @@ public class AuthController {
         } catch (DateTimeParseException exception) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "Дата рождения должна иметь формат YYYY-MM-DD"
+                    "Дата должна иметь формат YYYY-MM-DD"
             );
         }
 
@@ -125,8 +99,13 @@ public class AuthController {
             );
 
         } catch (IllegalArgumentException exception) {
+            HttpStatus status = exception.getMessage() != null
+                    && exception.getMessage().contains("уже существует")
+                    ? HttpStatus.CONFLICT
+                    : HttpStatus.BAD_REQUEST;
+
             throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
+                    status,
                     exception.getMessage()
             );
         }
@@ -134,11 +113,9 @@ public class AuthController {
 
     @PostMapping("/login")
     public AuthResponse login(@RequestBody LoginRequest request) {
-
         if (request == null
                 || isBlank(request.email())
                 || isBlank(request.password())) {
-
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Введите email и пароль"
@@ -149,7 +126,7 @@ public class AuthController {
             Authentication authentication =
                     authenticationManager.authenticate(
                             new UsernamePasswordAuthenticationToken(
-                                    request.email(),
+                                    request.email().trim().toLowerCase(),
                                     request.password()
                             )
                     );
@@ -157,16 +134,16 @@ public class AuthController {
             UserDetails userDetails =
                     (UserDetails) authentication.getPrincipal();
 
-            // JwtService.generateToken() принимает email типа String.
             String token = jwtService.generateToken(
                     userDetails.getUsername()
             );
 
-            User user = userRepository.findByEmail(request.email())
-                    .orElseThrow(() -> new ResponseStatusException(
-                            HttpStatus.UNAUTHORIZED,
-                            "Неверный email или пароль"
-                    ));
+            User user = userRepository.findByEmail(
+                    userDetails.getUsername()
+            ).orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Неверный email или пароль"
+            ));
 
             return new AuthResponse(
                     token,
