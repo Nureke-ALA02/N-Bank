@@ -44,37 +44,27 @@ public class UserService {
             );
         }
 
-        if (email == null
-                || !email.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
-            throw new IllegalArgumentException(
-                    "Введите корректный email"
-            );
+        if (email == null || !email.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
+            throw new IllegalArgumentException("Введите корректный email");
         }
 
         if (password == null || password.length() < 8) {
-            throw new IllegalArgumentException(
-                    "Пароль должен содержать минимум 8 символов"
-            );
+            throw new IllegalArgumentException("Пароль должен содержать минимум 8 символов");
         }
 
         if (birthDate == null) {
-            throw new IllegalArgumentException(
-                    "Дата рождения обязательна"
-            );
+            throw new IllegalArgumentException("Дата рождения обязательна");
         }
 
         email = email.trim().toLowerCase();
 
-        if (userRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException(
+        if (userRepository.existsByEmail(email)) {throw new IllegalArgumentException(
                     "Пользователь с таким email уже существует"
             );
         }
 
         if (userRepository.existsByIin(iin)) {
-            throw new IllegalArgumentException(
-                    "Пользователь с таким ИИН уже существует"
-            );
+            throw new IllegalArgumentException("Пользователь с таким ИИН уже существует");
         }
 
         User user = new User(
@@ -95,12 +85,9 @@ public class UserService {
             return null;
         }
 
-        User user = userRepository.findByEmail(
-                email.trim().toLowerCase()
-        ).orElse(null);
+        User user = userRepository.findByEmail(email.trim().toLowerCase()).orElse(null);
 
-        if (user != null
-                && passwordEncoder.matches(password, user.getPassword())) {
+        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
             return user;
         }
 
