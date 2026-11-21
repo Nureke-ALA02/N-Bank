@@ -1,3 +1,4 @@
+
 package com.bank.service;
 
 import com.bank.model.Account;
@@ -19,19 +20,18 @@ public class AccountService {
 
     public AccountService(
             AccountRepository accountRepository,
-            TransactionRepository transactionRepository
-    ) {
+            TransactionRepository transactionRepository) {
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
     }
 
     @Transactional
     public Account createAccount(User user) {
-        Account existingAccount =
+        Account existing =
                 accountRepository.findByOwner_Id(user.getId());
 
-        if (existingAccount != null) {
-            return existingAccount;
+        if (existing != null) {
+            return existing;
         }
 
         Account account = new Account(
@@ -49,30 +49,26 @@ public class AccountService {
 
     @Transactional
     public boolean deposit(Account account, BigDecimal amount) {
-        if (amount == null ||
-                amount.compareTo(BigDecimal.ZERO) <= 0) {
+        if (account == null || amount == null
+                || amount.compareTo(BigDecimal.ZERO) <= 0) {
             return false;
         }
 
-        account.setBalance(account.getBalance());
+        account.setBalance(account.getBalance().add(amount));
         accountRepository.save(account);
 
         Transaction transaction = new Transaction(
-                null,
-                account,
-                "DEPOSIT",
-                amount
+                null, account, "DEPOSIT", amount
         );
 
         transactionRepository.save(transaction);
-
         return true;
     }
 
     @Transactional
     public boolean withdraw(Account account, BigDecimal amount) {
-        if (amount == null ||
-                amount.compareTo(BigDecimal.ZERO) <= 0) {
+        if (account == null || amount == null
+                || amount.compareTo(BigDecimal.ZERO) <= 0) {
             return false;
         }
 
@@ -80,18 +76,14 @@ public class AccountService {
             return false;
         }
 
-        account.setBalance(account.getBalance());
+        account.setBalance(account.getBalance().subtract(amount));
         accountRepository.save(account);
 
         Transaction transaction = new Transaction(
-                null,
-                account,
-                "WITHDRAW",
-                amount
+                null, account, "WITHDRAW", amount
         );
 
         transactionRepository.save(transaction);
-
         return true;
     }
 
